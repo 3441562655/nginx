@@ -69,6 +69,70 @@ see `pre_build.sh`
 # Features
 - All features of nginx(latest release) are inherited, i.e., it is 100% compatible with nginx.
 
+# hello,world
+
+## cpp servlet class
+
+```
+#include "servlet.hpp"
+namespace hi{
+class hello : public servlet {
+    public:
+
+        void handler(request& req, response& res) {
+            res.headers.find("Content-Type")->second = "text/plain;charset=UTF-8";
+            res.content = "hello,world";
+            res.status = 200;
+        }
+
+    };
+}
+
+extern "C" hi::servlet* create() {
+    return new hi::hello();
+}
+
+extern "C" void destroy(hi::servlet* p) {
+    delete p;
+}
+
+```
+
+## cpp compile
+
+```
+g++ -std=c++11 -I/usr/local/nginx/include  -shared -fPIC hello.cpp -o hello.so
+install hello.so /usr/local/nginx/hi
+
+```
+
+## java servlet class
+
+```
+package hi;
+
+public class jhello implements hi.servlet {
+
+    public jhello() {
+
+    }
+
+    public void handler(hi.request req, hi.response res) {
+        res.status = 200;
+        res.content = "hello,world";
+
+    }
+}
+
+```
+
+## java compile
+
+```
+${JAVA_HOME}/bin/javac -classpath .:${NGINX_INSTALL_DIR}/java/hi-nginx-java.jar hi/jhello.java
+
+```
+
 # ngx_http_hi_module directives
 - directives : content: loc,if in loc
     - hi,default: ""
@@ -277,67 +341,5 @@ hi_java_version 9;
 - header
 - session
 
-# hello,world
 
-## cpp servlet class
-
-```
-#include "servlet.hpp"
-namespace hi{
-class hello : public servlet {
-    public:
-
-        void handler(request& req, response& res) {
-            res.headers.find("Content-Type")->second = "text/plain;charset=UTF-8";
-            res.content = "hello,world";
-            res.status = 200;
-        }
-
-    };
-}
-
-extern "C" hi::servlet* create() {
-    return new hi::hello();
-}
-
-extern "C" void destroy(hi::servlet* p) {
-    delete p;
-}
-
-```
-
-## cpp compile
-
-```
-g++ -std=c++11 -I/usr/local/nginx/include  -shared -fPIC hello.cpp -o hello.so
-install hello.so /usr/local/nginx/hi
-
-```
-
-## java servlet class
-
-```
-package hi;
-
-public class jhello implements hi.servlet {
-
-    public jhello() {
-
-    }
-
-    public void handler(hi.request req, hi.response res) {
-        res.status = 200;
-        res.content = "hello,world";
-
-    }
-}
-
-```
-
-## java compile
-
-```
-${JAVA_HOME}/bin/javac -classpath .:${NGINX_INSTALL_DIR}/java/hi-nginx-java.jar hi/jhello.java
-
-```
 
