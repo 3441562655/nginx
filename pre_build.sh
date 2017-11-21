@@ -1,5 +1,6 @@
 #!/bin/bash
-./configure     --with-http_ssl_module \
+auto/configure  \   
+                --with-http_ssl_module \
                 --with-http_v2_module \
                 --prefix=/usr/local/nginx \
                 --add-module=3rd/ngx_devel_kit-0.3.0 \
