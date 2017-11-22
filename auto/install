@@ -156,6 +156,24 @@ install:	build $NGX_INSTALL_PERL_MODULES
 
 	test -d '\$(DESTDIR)$NGX_PREFIX/html' \\
 		|| cp -R $NGX_HTML '\$(DESTDIR)$NGX_PREFIX'
+
+	test -d '\$(DESTDIR)$NGX_PREFIX/include' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/include'
+
+	cp 3rd/ngx_http_hi_module/include/*.hpp '\$(DESTDIR)$NGX_PREFIX/include'
+
+	test -d '\$(DESTDIR)$NGX_PREFIX/hi' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/hi'
+
+	cp auto/hi-project '\$(DESTDIR)$NGX_PREFIX/hi'
+
+	test -d '\$(DESTDIR)$NGX_PREFIX/python' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/python'
+
+	test -d '\$(DESTDIR)$NGX_PREFIX/lua' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/lua'
+
+	test -d '\$(DESTDIR)$NGX_PREFIX/java' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/java'
+
+	cp contrib/hi-nginx-java.jar '\$(DESTDIR)$NGX_PREFIX/java'
+
+	cp nginx.service /etc/systemd/system
 END
 
 
@@ -215,4 +233,30 @@ upgrade:
 	test -f $NGX_PID_PATH.oldbin
 
 	kill -QUIT \`cat $NGX_PID_PATH.oldbin\`
+END
+
+
+# create systemd service file
+
+cat << END > nginx.service
+
+[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+WorkingDirectory=$NGX_PREFIX
+Type=forking
+PIDFile=$NGX_PID_PATH
+ExecStartPre=$NGX_SBIN_PATH -t
+ExecStart=$NGX_SBIN_PATH
+ExecReload=/bin/kill -s HUP \$MAINPID
+ExecStop=/bin/kill -s QUIT \$MAINPID
+PrivateTmp=true
+#Restart=on-failure
+#RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
+
 END
